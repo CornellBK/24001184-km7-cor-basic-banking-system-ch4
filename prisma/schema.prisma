@@ -13,46 +13,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model User {
   id       Int    @id @default(autoincrement())
   name     String
   email    String @unique
   password String
 
-  bank_accounts bank_accounts[]
-  profiles      profiles?
+  bankAccount BankAccount[]
+  profile     Profile?
 }
 
-model bank_accounts {
-  id                  Int    @id @default(autoincrement())
-  bank_name           String
-  bank_account_number String @unique
-  balance             Float
+model BankAccount {
+  id                Int    @id @default(autoincrement())
+  bankName          String
+  bankAccountNumber String @unique
+  balance           Float
 
-  user_id Int
-  user    users @relation(fields: [user_id], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  transactions_sent     transactions[] @relation("sourceAccount")
-  transactions_received transactions[] @relation("destinationAccount")
+  transactionSent     Transaction[] @relation("sourceAccount")
+  transactionReceived Transaction[] @relation("destinationAccount")
 }
 
-model profiles {
-  id              Int    @id @default(autoincrement())
-  identity_type   String
-  identity_number String
-  address         String
+model Profile {
+  id             Int    @id @default(autoincrement())
+  identityType   String
+  identityNumber String
+  address        String
 
-  user_id Int   @unique
-  user    users @relation(fields: [user_id], references: [id])
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
 }
 
-model transactions {
-  id     Int   @id @default(autoincrement())
-  amount Float
+model Transaction {
+  id              Int      @id @default(autoincrement())
+  amount          Int
+  transactionDate DateTime @default(now())
 
-  source_account_id      Int
-  destination_account_id Int
+  sourceAccountId      Int
+  destinationAccountId Int
 
-  source_account      bank_accounts @relation("sourceAccount", fields: [source_account_id], references: [id])
-  destination_account bank_accounts @relation("destinationAccount", fields: [destination_account_id], references: [id])
+  sourceAccount      BankAccount @relation("sourceAccount", fields: [sourceAccountId], references: [id])
+  destinationAccount BankAccount @relation("destinationAccount", fields: [destinationAccountId], references: [id])
 }
